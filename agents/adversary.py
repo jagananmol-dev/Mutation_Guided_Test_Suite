@@ -16,6 +16,8 @@ Return JSON: {{"edge_cases":[{{"id":"EC-1","category":"boundary|type|exception|b
 AST/behavior analysis: {state.get('analysis', {})}
 Prior cases: {state.get('edge_cases', [])}
 Mutation analysis: {mutation_analysis}
+Measured coverage: {(state.get('pytest_result') or {}).get('coverage', {})}
+Prioritize concrete uncovered line/branch targets and survivor-triggering inputs.
 Mutation survivors: {(state.get('mutation_result') or {}).get('survived', [])}
 Source:
 ```python
