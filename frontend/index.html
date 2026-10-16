@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101820">
+  <meta name="description" content="Generate and refine pytest suites using mutation testing and a multi-agent workflow.">
+  <title>Mutation Lab — Test Suite Generator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Mutation Lab home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5 27 9.7v12.6L16 28.5 5 22.3V9.7L16 3.5Z"/><path d="m10 16 3.8 3.8L22 11.5"/></svg></span>
+      <span class="brand-copy"><strong>mutation<span>lab</span></strong><small>TEST INTELLIGENCE</small></span>
+    </a>
+    <div class="topbar-right"><span class="top-pill"><span class="pulse-dot"></span> MULTI-AGENT WORKFLOW</span><a href="http://127.0.0.1:8000/docs" target="_blank" rel="noreferrer" class="docs-link">API docs <span aria-hidden="true">↗</span></a></div>
+  </header>
+
+  <main id="top" class="page-shell">
+    <section class="hero">
+      <div class="eyebrow"><span class="eyebrow-line"></span> FROM SOURCE CODE TO STRONGER TESTS</div>
+      <h1>Find the bugs your<br><span>tests don’t catch.</span></h1>
+      <p class="hero-copy">Give Mutation Lab a Python function. Its agents analyze the code, generate pytest cases, run mutation testing, and refine the suite around the gaps they discover.</p>
+      <div class="feature-strip">
+        <div><span class="feature-icon">⌘</span><span><b>Analyze</b><small>AST + edge cases</small></span></div>
+        <span class="feature-arrow">→</span>
+        <div><span class="feature-icon">✓</span><span><b>Generate</b><small>Executable pytest</small></span></div>
+        <span class="feature-arrow">→</span>
+        <div><span class="feature-icon">↗</span><span><b>Mutate</b><small>Find test gaps</small></span></div>
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="Test generation workspace">
+      <div class="panel input-panel">
+        <div class="panel-heading">
+          <div><div class="section-kicker">01 / INPUT</div><h2>Configure your run</h2></div>
+          <span class="step-chip">PYTHON</span>
+        </div>
+
+        <div class="field-label-row"><label for="sourceCode">Source code</label><span id="charCount" class="char-count">0 / 20,000</span></div>
+        <div class="editor-shell">
+          <div class="editor-topline"><div class="window-dots"><i></i><i></i><i></i></div><span id="editorFilename">candidate.py</span><button id="clearCode" class="text-button" type="button">Clear</button></div>
+          <textarea id="sourceCode" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="def calculate_total(items):\n    ..." aria-describedby="sourceHint"></textarea>
+          <div class="editor-bottomline"><span id="sourceHint">Paste your function, or import a Python file below.</span><span class="language-label"><i></i> Python 3</span></div>
+        </div>
+        <div id="dropZone" class="upload-zone" tabindex="0" role="button" aria-label="Upload a Python file">
+          <input id="fileInput" type="file" accept=".py,text/x-python,text/plain" hidden>
+          <span class="upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></span>
+          <span class="upload-copy"><strong>Drop a .py file here <em>or browse</em></strong><small>Upload fills the editor, so you can review or edit it before running.</small></span>
+          <span class="upload-type">.PY</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="field"><label for="functionName">Target function <span class="optional">OPTIONAL</span></label><input id="functionName" type="text" maxlength="120" placeholder="e.g. calculate_total"><small>Leave blank to let the system identify it.</small></div>
+          <div class="field"><label for="maxRounds">Refinement rounds</label><div class="select-wrap"><select id="maxRounds"><option value="1">1 round — faster</option><option value="2">2 rounds</option><option value="3" selected>3 rounds — balanced</option><option value="4">4 rounds</option><option value="5">5 rounds — deeper</option></select><span aria-hidden="true">⌄</span></div><small>More rounds may improve coverage and increase runtime.</small></div>
+        </div>
+        <div class="field notes-field"><label for="requestNotes">Expected behavior / constraints <span class="optional">OPTIONAL</span></label><textarea id="requestNotes" rows="3" maxlength="4000" placeholder="Example: The interval is inclusive. Raise ValueError when lower is greater than upper."></textarea><small>Tell the agents what the function should do—not just what the code currently does.</small></div>
+
+        <details class="connection-settings">
+          <summary><span class="settings-icon">⚙</span> Backend connection <span id="connectionBadge" class="connection-badge unknown">Not checked</span></summary>
+          <div class="connection-body"><label for="apiBase">FastAPI base URL</label><div class="connection-row"><input id="apiBase" type="url" value="http://127.0.0.1:8000" spellcheck="false"><button id="checkConnection" type="button" class="secondary-button">Check</button></div><small>For deployment, enter your deployed backend URL. Don’t add <code>/generate</code>.</small><p id="connectionMessage" class="connection-message" aria-live="polite"></p></div>
+        </details>
+
+        <div class="run-footer"><div class="run-meta"><span class="run-shield">!</span><span><b>Prototype warning</b><small>The backend executes submitted Python. Use trusted code only.</small></span></div><button id="generateButton" class="primary-button" type="button"><span class="button-label">Generate test suite</span><span class="button-arrow" aria-hidden="true">↗</span></button></div>
+        <div id="errorBanner" class="error-banner" role="alert" hidden></div>
+      </div>
+
+      <div class="panel results-panel">
+        <div class="panel-heading results-heading">
+          <div><div class="section-kicker">02 / RESULTS</div><h2>Test intelligence</h2></div>
+          <span id="runStatus" class="status-pill idle"><span></span> Waiting for run</span>
+        </div>
+        <div id="emptyState" class="empty-state">
+          <div class="empty-illustration"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="empty-glyph">{<span>✓</span>}</div><div class="orbit-node node-a"></div><div class="orbit-node node-b"></div><div class="orbit-node node-c"></div></div>
+          <h3>Your test report starts here.</h3><p>Submit a function to see its generated tests, execution result, mutation score, and the agents’ findings.</p>
+          <div class="empty-list"><span><i>01</i> Generated pytest module</span><span><i>02</i> Baseline test execution</span><span><i>03</i> Mutation analysis and recommendations</span></div>
+        </div>
+        <div id="resultContent" hidden>
+          <div class="result-intro"><div><div id="resultFunction" class="result-function">Function run</div><div id="resultRunId" class="result-runid">Run ID —</div></div><button id="downloadTests" type="button" class="download-button" disabled><span aria-hidden="true">↓</span> Download tests.py</button></div>
+          <div class="metric-grid">
+            <div class="metric-card"><span class="metric-label">PYTEST STATUS</span><strong id="pytestMetric" class="metric-value">—</strong><small id="pytestSub">Baseline execution</small></div>
+            <div class="metric-card accent-card"><span class="metric-label">MUTATION SCORE</span><strong id="mutationMetric" class="metric-value">—</strong><small id="mutationSub">Mutants killed</small></div>
+            <div class="metric-card"><span class="metric-label">REVISIONS</span><strong id="revisionMetric" class="metric-value">—</strong><small>Agent refinement count</small></div>
+          </div>
+          <div id="reportSummary" class="report-summary"><div class="report-mark">✳</div><div><h3 id="reportHeadline">Run report</h3><p id="reportText"></p></div></div>
+          <div class="result-tabs" role="tablist" aria-label="Result details"><button class="result-tab active" data-tab="tests" role="tab" aria-selected="true">Generated tests</button><button class="result-tab" data-tab="pytest" role="tab" aria-selected="false">Pytest output</button><button class="result-tab" data-tab="mutation" role="tab" aria-selected="false">Mutation details</button><button class="result-tab" data-tab="report" role="tab" aria-selected="false">Agent report</button></div>
+          <section id="tab-tests" class="tab-pane active" role="tabpanel"><div class="code-header"><span><i></i> generated_tests.py</span><button id="copyTests" class="text-button" type="button">Copy code</button></div><pre class="code-output"><code id="generatedTests">No tests generated yet.</code></pre></section>
+          <section id="tab-pytest" class="tab-pane" role="tabpanel" hidden><div class="detail-heading"><h3>Baseline execution</h3><span id="pytestDetailStatus" class="mini-status">—</span></div><pre class="log-output" id="pytestOutput">No output available.</pre></section>
+          <section id="tab-mutation" class="tab-pane" role="tabpanel" hidden><div class="detail-heading"><h3>Mutation testing</h3><span id="mutationEngine" class="mini-status">—</span></div><div id="mutationOverview" class="mutation-overview"></div><h4 class="subhead">Evaluation scope</h4><div id="mutationScope" class="list-output"></div><h4 class="subhead">Surviving mutants</h4><div id="survivors" class="list-output"></div><h4 class="subhead">Recommendations</h4><div id="recommendations" class="list-output"></div><details class="raw-details"><summary>Raw mutation result</summary><pre id="mutationRaw" class="log-output"></pre></details></section>
+          <section id="tab-report" class="tab-pane" role="tabpanel" hidden><div class="detail-heading"><h3>Agent assessment</h3><span id="reportRounds" class="mini-status">—</span></div><h4 class="subhead">Strengths</h4><div id="reportStrengths" class="list-output"></div><h4 class="subhead">Coverage gaps</h4><div id="coverageGaps" class="list-output"></div><h4 class="subhead">Remaining gaps</h4><div id="reportGaps" class="list-output"></div><h4 class="subhead">Next steps</h4><div id="reportSteps" class="list-output"></div><details class="raw-details"><summary>Full report JSON</summary><pre id="reportRaw" class="log-output"></pre></details></section>
+        </div>
+        <div id="loadingOverlay" class="loading-overlay" hidden><div class="loading-spinner"></div><h3 id="loadingTitle">Agents are working</h3><p id="loadingText">Analyzing source and planning edge cases…</p><div class="loading-track"><span></span></div><small>Mutation testing can take a little time. Keep this tab open.</small></div>
+      </div>
+    </section>
+    <footer class="page-footer"><span>Mutation Lab <span class="footer-dot">•</span> Multi-agent QA research prototype</span><span>Built around Python · pytest · mutation testing</span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
