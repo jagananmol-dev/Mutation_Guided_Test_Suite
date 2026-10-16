@@ -1,0 +1,10 @@
+.git
+.venv
+__pycache__
+*.py[cod]
+.env
+trace.jsonl
+.pytest_cache
+.mutmut-cache
+htmlcov
+.coverage
