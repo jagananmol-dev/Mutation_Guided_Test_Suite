@@ -2,7 +2,6 @@
 
 A multi-agent system that creates pytest tests for a Python function, executes them, runs mutation testing, classifies surviving mutants, and routes back for targeted revisions. The project uses LangGraph for stateful routing and the Anthropic Messages API for agent decisions.
 
-> **Important:** subprocess timeouts and environment-variable filtering are defense-in-depth, not a complete sandbox. Do not expose this prototype to arbitrary untrusted code until P4 adds and validates isolated Docker execution (restricted capabilities, no network, resource limits, read-only filesystem, and no secrets in the runner environment).
 
 ## Quick start
 
@@ -12,7 +11,7 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # Windows PowerShell: Copy-Item .env.example .env
-# Add ANTHROPIC_API_KEY to .env; keep .env out of Git.
+# Add OpenAI_API_KEY to .env; keep .env out of Git.
 python run.py --file examples/sample_function.py --function clamp
 ```
 
@@ -35,7 +34,7 @@ Open `http://127.0.0.1:8000/docs` and submit a `POST /generate` request, for exa
 }
 ```
 
-Without `ANTHROPIC_API_KEY`, limited deterministic fallbacks are used for local smoke tests. They are deliberately identified as fallbacks in the trace/report and are **not** evidence of full agentic behavior. Semantic test generation and supervisor choices require the API key.
+Without `OpenAI_API_KEY`, limited deterministic fallbacks are used for local smoke tests. They are deliberately identified as fallbacks in the trace/report and are **not** evidence of full agentic behavior. Semantic test generation and supervisor choices require the API key.
 
 ## Architecture
 
@@ -72,14 +71,6 @@ The Supervisor is the only router. Agent nodes return state updates and append r
 | Mutation Analyst | `agents/mutation_analyst.py` | Classifies surviving mutants as likely gaps, likely equivalent, or uncertain. |
 | Reporter | `agents/reporter.py` | Produces a factual run report with limitations and unresolved gaps. |
 
-## Team ownership from the onboarding brief
-
-- **P1 — Core Lead:** `core/*`, Supervisor, `api/main.py`, orchestration/design diagram.
-- **P2 — Analysis:** Code Analyst, `tools/ast_parser.py`, Adversary, Reporter, synopsis and schemas.
-- **P3 — Generation & Quality:** Test Writer, Test Critic, `tools/pytest_runner.py`, `tests/`, CI, README and agent-role documentation.
-- **P4 — Execution & Deployment:** Mutation Analyst, `tools/mutmut_runner.py`, sandbox hardening, Dockerfile and deployment; capture a real deployed trace.
-
-Use one branch per workstream (e.g. `p2/code-analyst`), small commits, and pull requests. Register each contributor's GitHub username before committing, and never commit `.env` or trace entries edited by hand.
 
 ## Tests and CI
 
